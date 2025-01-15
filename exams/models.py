@@ -19,7 +19,7 @@ class Exam(models.Model):
     description = models.TextField()
     deff = models.CharField(choices=difficulty,max_length=10)
     is_premium = models.BooleanField(default=False)
-    created_by = models.ForeignKey(User,on_delete=models.CASCADE,limit_choices_to={'role':'teacher'})
+    created_by = models.ForeignKey(User,on_delete=models.CASCADE,limit_choices_to={'role':'teacher'},default=1)
 
     def __str__(self):
         return self.title

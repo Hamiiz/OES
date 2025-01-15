@@ -1,0 +1,29 @@
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Create Exams</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+   <h1>TEACHERS CREATE EXAMS</h1>
+   <form action="{% url 'create_exam'%}" method="post">
+    {% csrf_token %}
+    <h1>Create Exam</h1>
+    <input type='text' placeholder='Enter Exam name' name='title'> <br>
+    <textarea name="desc" id="">Enter a description</textarea> <br>
+    <label for="">select difficulty</label>
+    <input type="radio" name="deff" value="e" id=""> <br>
+    <input type="radio" name="deff" value="m" id=""><br>
+    <input type="radio" name="deff" value="h" id=""><br>
+    <p>is it premium?</p>
+    <input type='checkbox' value='True' name='premium'> <br>
+    <input type='submit' value='submit' name='submitter'>
+    
+   </form>
+
+   <form>
+  </body>
+</html>

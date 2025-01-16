@@ -1,9 +1,15 @@
 # this file manages urls within the exams app
 from django.urls import path
 from . import views
+from django.contrib.auth.views import LoginView
+
 
 urlpatterns = [
      path('exam/create/', views.create_exam, name='create_exam'),
+     path('exam/<int:id>/', views.view_exam, name='view_exam'),
+     path('login/teacher/', views.auth, name='tlogin'),
+     path('logout/',views.Logout,name='logout')
+
 ]
 
 # urlpatterns = [

@@ -47,6 +47,9 @@ class Payment(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)  # Paid or not
 
+class Choice(models.Model):
+    question= models.ForeignKey(Question,on_delete=models.CASCADE,related_name='choice')
+    choice_text = models.CharField(max_length=700)
 
 
 

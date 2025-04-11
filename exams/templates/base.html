@@ -1,0 +1,367 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Examination System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Mobile Sidebar Styles */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #0d6efd;
+            z-index: 1030;
+            padding: 0 15px;
+        }
+
+        .mobile-nav-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 15px 0;
+        }
+
+        .sidebar {
+            transition: 0.3s;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+
+        @media (max-width: 767.98px) {
+            .mobile-nav {
+                display: flex;
+                align-items: center;
+            }
+
+            .sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: -100% !important;
+                width: 80% !important;
+                max-width: 300px !important;
+                height: 100vh !important;
+                z-index: 1050 !important;
+                background: white !important;
+                overflow-y: auto !important;
+                padding: 20px !important;
+                box-shadow: 0 0 15px rgba(0,0,0,0.2) !important;
+            }
+
+            .sidebar.show {
+                left: 0 !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 60px !important;
+            }
+
+            .overlay.show {
+                display: block;
+            }
+        }
+
+        .profile-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .free-status {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .premium-status {
+            background-color: #ffd700;
+            color: #000;
+        }
+        .nav-link {
+            padding: 8px 15px;
+            color: #495057;
+        }
+        .exam-list .nav-link {
+            padding: 4px 0;
+        }
+        .exam-list .nav-link:hover {
+            background-color: transparent !important;
+            text-decoration: underline !important;
+        }
+        .table tbody tr {
+            cursor: pointer;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .question-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        #examTimer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .choice-item {
+            display: block;
+            padding: 10px 10px 10px 40px;
+            margin: 10px 0;
+            position: relative;
+            cursor: pointer;
+            color: #34495E;
+            font-size: 16px;
+            text-align: left;
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        .choice-item:before {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #4A90E2;
+            border-radius: 50%;
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+        .choice-item.selected {
+            background-color: #e3f2fd;
+            border-color: #4A90E2;
+        }
+        .choice-item.selected:before {
+            background-color: #4A90E2;
+            box-shadow: inset 0 0 0 3px white;
+        }
+        .blank-input {
+            display: inline-block;
+            min-width: 60px;
+            border-bottom: 2px solid #4A90E2;
+            text-align: center;
+            padding: 0 5px;
+        }
+        .blank-input:focus {
+            outline: none;
+            border-bottom-color: #357ABD;
+        }
+        .question-nav {
+            padding: 15px 30px;  /* Fixed padding: 15px top/bottom, 30px left/right */
+            border-radius: 10px;
+            margin: 20px 0;
+            width: fit-content;  /* Container will fit content width */
+            margin-left: auto;   /* Center the container */
+            margin-right: auto;
+            background-color: transparent;  /* Make background transparent */
+        }
+        
+        .question-nav .pagination {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 5px;
+            justify-content: center;
+            margin: 0;
+            align-items: center;
+        }
+        
+        .question-nav .page-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 500;
+            border: 1px solid #dee2e6;
+            padding: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .question-nav .page-item.disabled .page-link {
+            background-color: transparent;
+            border-color: transparent;
+            color: #6c757d;
+        }
+        
+        .question-nav .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+        
+        .question-nav .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: #0d6efd;
+            transform: scale(1.05);
+        }
+        
+        .question-nav .page-item.active .page-link:hover {
+            background-color: #0d6efd;
+            color: white;
+            transform: none;
+        }
+
+        @media (min-width: 768px) {
+            .navbar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header -->
+    <nav class="navbar navbar-dark bg-primary fixed-top d-md-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand">Online Exam</span>
+        </div>
+    </nav>
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Dashboard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Profile Section -->
+            <div class="profile-section mb-4">
+                <div class="d-flex align-items-center mb-2">
+                    {% if user.is_authenticated %}
+                        {% if user.profile.profile_picture %}
+                            <img src="{{ user.profile.profile_picture.url }}" 
+                                 alt="Profile" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" 
+                                 style="width: 50px; height: 50px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <h6 class="mb-0">{{ user.username }}</h6>
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" 
+                             style="width: 50px; height: 50px;">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <h6 class="mb-0">Guest</h6>
+                    {% endif %}
+                </div>
+                <span class="badge bg-secondary">Free Plan</span>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-circle me-2"></i> Profile
+                </a>
+                <a href="{% url 'recent_exams' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-clock me-2"></i> Recent Exams
+                </a>
+                <a href="{% url 'exam_list' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-list me-2"></i> View All Exams
+                </a>
+                <a href="{% url 'performance' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-chart-line me-2"></i> Performance
+                </a>
+            </div>
+
+            <!-- Free Exams -->
+            <div class="mt-4">
+                <h6 class="mb-3">Free Exams</h6>
+                <div class="list-group">
+                    {% for exam in exam %}
+                        {% if exam.is_premium != True %}
+                            <a href="{% url 'take_exam' exam.id %}" class="list-group-item list-group-item-action">
+                                {{exam.title}}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Premium Exams -->
+            <div class="mt-4">
+                <h6 class="mb-3">Premium Exams</h6>
+                <div class="list-group">
+                    {% for exam in exam %}
+                        {% if exam.is_premium == True %}
+                            <a href="{% url 'take_exam' exam.id %}" class="list-group-item list-group-item-action disabled">
+                                {{exam.title}} <span class="badge bg-warning text-dark ms-2">Premium</span>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Upgrade Button -->
+            <div class="mt-4">
+                <a href="{% url 'subscription_plans' %}" class="btn btn-warning w-100">
+                    Upgrade Account
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <div class="d-none d-md-block col-md-3 col-lg-2 bg-light sidebar">
+        <!-- Same content as mobile sidebar but for desktop -->
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 col-lg-10 ms-sm-auto px-md-4">
+        <div class="container-fluid mt-4">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <style>
+        @media (max-width: 767.98px) {
+            body {
+                padding-top: 56px;
+            }
+            .offcanvas {
+                max-width: 80%;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
